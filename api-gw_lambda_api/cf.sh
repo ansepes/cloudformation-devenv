@@ -28,7 +28,7 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
-SCRIPT_FILE="cf-template.yml"
+SCRIPT_FILE="cf.yml"
 SCRIPT_DIR=$(cd $(dirname $(readlink $0 || echo $0));pwd)
 CF_FILE_NAME="file://${SCRIPT_DIR}/${SCRIPT_FILE}"
 
