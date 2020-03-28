@@ -1,23 +1,35 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: This CloudFormation template to create S3 Bucket
- 
+AWSTemplateFormatVersion: 2010-09-09
+Description: This CloudFormation template to createAPI Gateway
 Parameters:
-  S3BucketName:
-    Description: Type of this BacketName.
+  FunctionName:
     Type: String
- 
+    Description: "Lambda Function Name (ex: hello-world)"
 Resources:
-  S3Bucket:
-    Type: AWS::S3::Bucket
+  Api:
+    Type: "AWS::ApiGateway::RestApi"
     Properties:
-      BucketName: !Sub ${S3BucketName}
-      AccessControl: Private
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: True
-        BlockPublicPolicy: True
-        IgnorePublicAcls: True
-        RestrictPublicBuckets: True
- 
-Outputs:
-  S3BucketName:
-    Value: !Ref S3Bucket
+      Name: "api"
+  Resource:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: !Sub "${FunctionName}"
+  LambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !Sub "${FunctionName}"
+      Action: "lambda:InvokeFunction"
+      Principal: "apigateway.amazonaws.com"
+  ResourceMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref Resource
+      AuthorizationType: "None"
+      HttpMethod: "GET"
+      Integration:
+        Type: "AWS"
+        IntegrationHttpMethod: "POST"
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FunctionName}/invocations"
+    DependsOn: "LambdaPermission"

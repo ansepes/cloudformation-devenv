@@ -32,13 +32,13 @@ SCRIPT_FILE="cf.yml"
 SCRIPT_DIR=$(cd $(dirname $(readlink $0 || echo $0));pwd)
 CF_FILE_NAME="file://${SCRIPT_DIR}/${SCRIPT_FILE}"
 
-S3_BUCKET_NAME=$2
-CF_STACK_NAME="s3-buckect-create-${S3_BUCKET_NAME}"
+LAMBDA_FUNC_NAME=$2
+CF_STACK_NAME="api-gw-create-${LAMBDA_FUNC_NAME}"
 
 
 aws cloudformation $CFN_SUB \
 --stack-name ${CF_STACK_NAME} \
 --template-body ${CF_FILE_NAME} \
 --parameters \
-ParameterKey=S3BucketName,ParameterValue=${S3_BUCKET_NAME} \
+ParameterKey=FunctionName,ParameterValue=${LAMBDA_FUNC_NAME} \
 | jq .
