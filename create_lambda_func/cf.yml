@@ -4,6 +4,9 @@ Metadata:
 Description: ""
 
 Parameters:
+  EnvName:
+    Description: enviroment name.
+    Type: String
   LambdaName:
     Description: Lambda function name.
     Type: String
@@ -13,8 +16,11 @@ Resources:
     Type: "AWS::Lambda::Function"
     Properties:
       Description: ""
-      FunctionName: !Sub ${LambdaName}
-      Handler: "index.handler"
+      Environment:
+        Variables:
+          envKey: !Sub ${EnvName}
+      FunctionName: !Sub "${EnvName}-${LambdaName}"
+      Handler: !Sub "${LambdaName}.handler"
       Code:
         S3Bucket: "ansopos-lambda-sources"
         S3Key: "default.zip"

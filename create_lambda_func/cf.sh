@@ -32,12 +32,14 @@ SCRIPT_FILE="cf.yml"
 SCRIPT_DIR=$(cd $(dirname $(readlink $0 || echo $0));pwd)
 CF_FILE_NAME="file://${SCRIPT_DIR}/${SCRIPT_FILE}"
 
-LAMBDA_FUNC_NAME="$2-$3"
-CF_STACK_NAME="lambda-func-create-${LAMBDA_FUNC_NAME}"
+ENV_KEY=$2
+LAMBDA_FUNC_NAME=$3
+CF_STACK_NAME="lambda-func-create-${ENV_KEY}-${LAMBDA_FUNC_NAME}"
 
 aws cloudformation $CFN_SUB \
 --stack-name ${CF_STACK_NAME} \
 --template-body ${CF_FILE_NAME} \
 --parameters \
 ParameterKey=LambdaName,ParameterValue=${LAMBDA_FUNC_NAME} \
+ParameterKey=EnvName,ParameterValue=${ENV_KEY} \
 | jq .
