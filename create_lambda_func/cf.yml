@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+  Generator: "former2"
+Description: ""
+
+Parameters:
+  LambdaName:
+    Description: Lambda function name.
+    Type: String
+
+Resources:
+  LambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Description: ""
+      FunctionName: !Sub ${LambdaName}
+      Handler: "index.handler"
+      Code:
+        S3Bucket: "ansopos-lambda-sources"
+        S3Key: "default.zip"
+      MemorySize: 512
+      Role: !Sub "arn:aws:iam::${AWS::AccountId}:role/service-role/elixir_lambda_role"
+      Runtime: "nodejs12.x"
+      Timeout: 10
+      TracingConfig:
+        Mode: "PassThrough"
+
+  LambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*"
